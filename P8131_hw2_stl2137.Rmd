@@ -1,0 +1,51 @@
+---
+title: "P8131_HW2_stl2137"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+Problem 1
+```{r} 
+### Import Data
+dose_dat <- tibble(
+  dose = c(0, 1, 2, 3, 4),
+  death = c(2, 8, 15, 23, 27),
+  num_total = c(30, 30, 30, 30, 30)
+) 
+
+### Data Preparation
+resp <- cbind(dose_dat$death, dose_dat$num_total-dose_dat$death)
+```
+
+```{r}
+## Logit Model
+###Summary Statistics
+logit_dose_mod <- glm(resp~dose, family = binomial(link='logit'), data = dose_dat)
+summary(logit_dose_mod)
+plot(dose_dat$dose,dose_dat$death/dose_dat$num_total)
+
+### CI for Beta
+vcov(logit_dose_mod)
+beta_logit <- logit_dose_mod$coefficients[2]
+se_logit <- sqrt(vcov(logit_dose_mod)[2,2])
+beta_logit+c(qnorm(0.025),0,-qnorm(0.025))*se_logit
+```
+
+```{r}
+## Probit Model
+probit_dose_mod <- glm(resp~dose, family=binomial(link='probit'), data = dose_dat)
+summary(probit_dose_mod)
+
+
+```
+
+```{r}
+### C-log-log Model
+clog_dose_mod <- glm(resp~dose, family=binomial(link='cloglog'), data = dose_dat)
+summary(clog_dose_mod)
+```
+
