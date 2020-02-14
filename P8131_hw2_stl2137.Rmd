@@ -32,11 +32,15 @@ plot(dose_dat$dose,dose_dat$death/dose_dat$num_total)
 vcov(logit_dose_mod)
 beta_logit <- logit_dose_mod$coefficients[2]
 se_logit <- sqrt(vcov(logit_dose_mod)[2,2])
-beta_logit+c(qnorm(0.025),0,-qnorm(0.025))*se_logit
+CI_logit_high <- beta_logit+c(-qnorm(0.025))*se_logit
+CI_logit_low <- beta_logit+c(qnorm(0.025))*se_logit
 
 ### Deviance 
 dev_logit <- sum(residuals(logit_dose_mod,type='deviance')^2)
-dev_logit
+
+### Probability of Death Given Dose = 0.01
+p_hat_logit = predict(logit_dose_mod, data.frame(dose= 0.01), se.fit=TRUE, type = 'response')
+p_logit = p_hat_logit[[1]]
 ```
 
 ```{r}
@@ -49,11 +53,15 @@ summary(probit_dose_mod)
 vcov(probit_dose_mod)
 beta_probit <- probit_dose_mod$coefficients[2]
 se_probit <- sqrt(vcov(probit_dose_mod)[2,2])
-beta_probit + c(qnorm(0.025), 0, -qnorm(0.025))*se_probit
+CI_probit_high <- beta_probit + c(-qnorm(0.025))*se_probit
+CI_probit_low <- beta_probit + c(qnorm(0.025))*se_probit
 
 ### Deviance 
 dev_probit <- sum(residuals(probit_dose_mod,type='deviance')^2)
-dev_probit
+
+### Probability of Death Given Dose = 0.01
+p_hat_probit = predict(probit_dose_mod, data.frame(dose= 0.01), se.fit=TRUE, type = 'response')
+p_probit = p_hat_probit[[1]]
 ```
 
 ```{r}
@@ -65,10 +73,24 @@ summary(clog_dose_mod)
 vcov(clog_dose_mod)
 beta_clog <- clog_dose_mod$coefficients[2]
 se_clog <- sqrt(vcov(clog_dose_mod)[2,2])
-beta_clog + c(qnorm(0.025), 0, -qnorm(0.025))*se_clog
+CI_clog_high <- beta_clog + c(-qnorm(0.025))*se_clog
+CI_clog_low <- beta_clog + c(qnorm(0.025))*se_clog
 
 ### Deviance 
 dev_clog <- sum(residuals(clog_dose_mod,type='deviance')^2)
 dev_clog
+
+### Probability of Death Given Dose = 0.01
+p_hat_clog = predict(clog_dose_mod, data.frame(dose= 0.01), se.fit=TRUE, type = 'response')
+p_clog = p_hat_clog[[1]]
+```
+
+```{r}
+logit_table <- cbind(beta_logit, CI_logit_low, CI_logit_high, dev_logit, p_logit)
+probit_table <- cbind(beta_probit, CI_probit_low, CI_probit_high, dev_probit, p_probit)
+clog_table <- cbind(beta_clog, CI_clog_low, CI_clog_high, dev_clog, p_clog)
+
+total_dose_table <- rbind(logit_table, probit_table, clog_table)
+knitr::kable(total_dose_table, col.names = c("Estimate of Beta", "Low CI for Beta", "High CI for Beta", "Deviance", "Probability of Death Given Dose = 0.01"), digits = 4)
 ```
 
