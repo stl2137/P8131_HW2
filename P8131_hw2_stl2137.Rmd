@@ -23,7 +23,7 @@ resp <- cbind(dose_dat$death, dose_dat$num_total-dose_dat$death)
 
 ```{r}
 ## Logit Model
-###Summary Statistics
+### Summary Statistics
 logit_dose_mod <- glm(resp~dose, family = binomial(link='logit'), data = dose_dat)
 summary(logit_dose_mod)
 plot(dose_dat$dose,dose_dat$death/dose_dat$num_total)
@@ -33,19 +33,42 @@ vcov(logit_dose_mod)
 beta_logit <- logit_dose_mod$coefficients[2]
 se_logit <- sqrt(vcov(logit_dose_mod)[2,2])
 beta_logit+c(qnorm(0.025),0,-qnorm(0.025))*se_logit
+
+### Deviance 
+dev_logit <- sum(residuals(logit_dose_mod,type='deviance')^2)
+dev_logit
 ```
 
 ```{r}
 ## Probit Model
+### Summary Statistics
 probit_dose_mod <- glm(resp~dose, family=binomial(link='probit'), data = dose_dat)
 summary(probit_dose_mod)
 
+### CI for Beta
+vcov(probit_dose_mod)
+beta_probit <- probit_dose_mod$coefficients[2]
+se_probit <- sqrt(vcov(probit_dose_mod)[2,2])
+beta_probit + c(qnorm(0.025), 0, -qnorm(0.025))*se_probit
 
+### Deviance 
+dev_probit <- sum(residuals(probit_dose_mod,type='deviance')^2)
+dev_probit
 ```
 
 ```{r}
 ### C-log-log Model
 clog_dose_mod <- glm(resp~dose, family=binomial(link='cloglog'), data = dose_dat)
 summary(clog_dose_mod)
+
+### CI for Beta
+vcov(clog_dose_mod)
+beta_clog <- clog_dose_mod$coefficients[2]
+se_clog <- sqrt(vcov(clog_dose_mod)[2,2])
+beta_clog + c(qnorm(0.025), 0, -qnorm(0.025))*se_clog
+
+### Deviance 
+dev_clog <- sum(residuals(clog_dose_mod,type='deviance')^2)
+dev_clog
 ```
 
