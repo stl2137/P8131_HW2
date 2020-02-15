@@ -10,7 +10,7 @@ library(tidyverse)
 
 #Problem 1
 ##Part i
-#DO THE INTERPRETATIONS
+Fill out the table and give comments.
 ```{r} 
 ### Import Data
 dose_dat <- tibble(
@@ -93,10 +93,19 @@ probit_table <- cbind(beta_probit, CI_probit_low, CI_probit_high, dev_probit, p_
 clog_table <- cbind(beta_clog, CI_clog_low, CI_clog_high, dev_clog, p_clog)
 
 total_dose_table <- rbind(logit_table, probit_table, clog_table)
-knitr::kable(total_dose_table, col.names = c("Estimate of Beta", "Low CI for Beta", "High CI for Beta", "Deviance", "Probability of Death Given Dose = 0.01"), digits = 4)
+knitr::kable(total_dose_table, col.names = c("Estimate of Beta", "Low CI for Beta", "High CI for Beta", "Deviance", "Probability of Death Given Dose = 0.01"), row.names = c("logit", "probit", "c-log-log"), digits = 4)
 ```
 
+#What comments should I write?
+
+The estimate of beta value for the logit model is higher than the other models at 1.1619 compared to the probit's 0.6864 and the c-log-log's 0.7468. 
+
+The probability of death given that the dose equals 0.01 is higher for the c-log-log model (0.1282) compared to the logit (0.0901) and probit (0.0853) models'.
+
+The deviance for the c-log-log model (2.2305) is also extremely high compared to the logit (0.3787) and probit models (0.3137). With such a high deviance, the c-log-log model is not the most appropriate model to use. 
+
 ##Part ii
+Suppose that the dose level is in natural logarithm scale, estimate LD50 with 90% confidence interval based on the three models.
 ```{r}
 ###Logit
 beta0_logit <- logit_dose_mod$coefficients[1]
@@ -107,7 +116,11 @@ exp(x0fit_logit)
 varx0_logit <- betacov_logit[1,1]/(beta1_logit^2)+betacov_logit[2,2]*(beta0_logit^2)/(beta1_logit^4)-2*betacov_logit[1,2]*beta0_logit/(beta1_logit^3)
 c(x0fit_logit, sqrt(varx0_logit))
 exp(x0fit_logit+c(qnorm(0.05),-qnorm(0.05))*sqrt(varx0_logit))
+```
 
+For the logit model, we are 95% confidence that the LD50 dose is between 5.5096 and 9.9096.
+
+```{r}
 ###Probit
 beta0_probit <- probit_dose_mod$coefficients[1]
 beta1_probit <- probit_dose_mod$coefficients[2]
@@ -116,8 +129,12 @@ x0fit_probit <- -beta0_probit/beta1_probit
 exp(x0fit_probit)
 varx0_probit <- betacov_probit[1,1]/(beta1_probit^2)+betacov_probit[2,2]*(beta0_probit^2)/(beta1_probit^4)-2*betacov_probit[1,2]*beta0_probit/(beta1_probit^3)
 c(x0fit_probit, sqrt(varx0_probit))
-exp(x0fit_logit+c(qnorm(0.05),-qnorm(0.05))*sqrt(varx0_logit))
+exp(x0fit_probit+c(qnorm(0.05),-qnorm(0.05))*sqrt(varx0_probit))
+```
 
+For the probit model, we are 95% confident that the LD50 dose is between 5.5826 and 9.9904. 
+
+```{r}
 ### C-log-log
 beta0_clog <- clog_dose_mod$coefficients[1]
 beta1_clog <- clog_dose_mod$coefficients[2]
@@ -127,8 +144,9 @@ exp(x0fit_clog)
 varx0_clog <- betacov_clog[1,1]/(beta1_clog^2) + betacov_clog[2,2]*(beta0_clog^2)/(beta1_clog^4)-2*betacov_clog[1,2]*beta0_clog/(beta1_clog^3)
 c(x0fit_clog, sqrt(varx0_clog))
 exp(x0fit_clog+c(qnorm(0.05), -qnorm(0.05))*sqrt(varx0_clog))
-
 ```
+
+For the c-log-log model, we are 95% confident that the LD50 dose is between 6.6363 and 11.7787.
 
 #Problem 2
 ##Part i
@@ -184,10 +202,9 @@ There is a 0.03095 increase in log odds ratio with every $1000 increase in schol
 We are confident 95% that the log odds ratio of enrollment with every $1000 increase in scholarship amounts is between 0.01197845 and 0.04992240. 
 
 ##Part iii
+###QUESTIONS ABOUT THIS
 How much scholarship should we provide to get 40% yield rate (the percentage of admitted students who enroll?) What is the 95% CI?
 ```{r}
-###QUESTIONS ABOUT THIS
-
 beta0_schol <- logit_schol_mod$coefficients[1]
 beta1_schol <- logit_schol_mod$coefficients[2]
 betacov_schol <- vcov(logit_schol_mod)
