@@ -366,7 +366,7 @@ summary {
 </div>
 
 
-<p>Problem 1</p>
+<p>#Problem 1 ##Part i Fill out the table and give comments.</p>
 <pre class="r"><code>### Import Data
 dose_dat &lt;- tibble(
   dose = c(0, 1, 2, 3, 4),
@@ -551,6 +551,139 @@ knitr::kable(total_dose_table, col.names = c(&quot;Estimate of Beta&quot;, &quot
 </tr>
 </tbody>
 </table>
+<p>#What comments should I write?</p>
+<p>The estimate of beta value for the logit model is higher than the other models at 1.1619 compared to the probit’s 0.6864 and the c-log-log’s 0.7468.</p>
+<p>The probability of death given that the dose equals 0.01 is higher for the c-log-log model (0.1282) compared to the logit (0.0901) and probit (0.0853) models’.</p>
+<p>The deviance for the c-log-log model (2.2305) is also extremely high compared to the logit (0.3787) and probit models (0.3137). With such a high deviance, the c-log-log model is not the most appropriate model to use.</p>
+<p>##Part ii Suppose that the dose level is in natural logarithm scale, estimate LD50 with 90% confidence interval based on the three models.</p>
+<pre class="r"><code>###Logit
+beta0_logit &lt;- logit_dose_mod$coefficients[1]
+beta1_logit &lt;- logit_dose_mod$coefficients[2]
+betacov_logit &lt;- vcov(logit_dose_mod)
+x0fit_logit &lt;- -beta0_logit/beta1_logit
+exp(x0fit_logit)</code></pre>
+<pre><code>## (Intercept) 
+##    7.389056</code></pre>
+<pre class="r"><code>varx0_logit &lt;- betacov_logit[1,1]/(beta1_logit^2)+betacov_logit[2,2]*(beta0_logit^2)/(beta1_logit^4)-2*betacov_logit[1,2]*beta0_logit/(beta1_logit^3)
+c(x0fit_logit, sqrt(varx0_logit))</code></pre>
+<pre><code>## (Intercept)        dose 
+##   2.0000000   0.1784367</code></pre>
+<pre class="r"><code>exp(x0fit_logit+c(qnorm(0.05),-qnorm(0.05))*sqrt(varx0_logit))</code></pre>
+<pre><code>## [1] 5.509631 9.909583</code></pre>
+<p>For the logit model, we are 90% confidence that the LD50 dose is between 5.5096 and 9.9096.</p>
+<pre class="r"><code>###Probit
+beta0_probit &lt;- probit_dose_mod$coefficients[1]
+beta1_probit &lt;- probit_dose_mod$coefficients[2]
+betacov_probit &lt;- vcov(probit_dose_mod)
+x0fit_probit &lt;- -beta0_probit/beta1_probit
+exp(x0fit_probit)</code></pre>
+<pre><code>## (Intercept) 
+##     7.43583</code></pre>
+<pre class="r"><code>varx0_probit &lt;- betacov_probit[1,1]/(beta1_probit^2)+betacov_probit[2,2]*(beta0_probit^2)/(beta1_probit^4)-2*betacov_probit[1,2]*beta0_probit/(beta1_probit^3)
+c(x0fit_probit, sqrt(varx0_probit))</code></pre>
+<pre><code>## (Intercept)        dose 
+##   2.0063102   0.1742755</code></pre>
+<pre class="r"><code>exp(x0fit_probit+c(qnorm(0.05),-qnorm(0.05))*sqrt(varx0_probit))</code></pre>
+<pre><code>## [1] 5.582588 9.904289</code></pre>
+<p>For the probit model, we are 95% confident that the LD50 dose is between 5.5826 and 9.9904.</p>
+<pre class="r"><code>### C-log-log
+beta0_clog &lt;- clog_dose_mod$coefficients[1]
+beta1_clog &lt;- clog_dose_mod$coefficients[2]
+betacov_clog &lt;- vcov(clog_dose_mod)
+x0fit_clog &lt;- (log(log(2))-beta0_clog)/(beta1_clog)
+exp(x0fit_clog)</code></pre>
+<pre><code>## (Intercept) 
+##    8.841249</code></pre>
+<pre class="r"><code>varx0_clog &lt;- betacov_clog[1,1]/(beta1_clog^2) + betacov_clog[2,2]*(beta0_clog^2)/(beta1_clog^4)-2*betacov_clog[1,2]*beta0_clog/(beta1_clog^3)
+c(x0fit_clog, sqrt(varx0_clog))</code></pre>
+<pre><code>## (Intercept)        dose 
+##   2.1794281   0.1744033</code></pre>
+<pre class="r"><code>exp(x0fit_clog+c(qnorm(0.05), -qnorm(0.05))*sqrt(varx0_clog))</code></pre>
+<pre><code>## [1]  6.636337 11.778739</code></pre>
+<p>For the c-log-log model, we are 95% confident that the LD50 dose is between 6.6363 and 11.7787.</p>
+<p>#Problem 2 ##Part i How does the model fit the data?</p>
+<pre class="r"><code>### Import Data
+scholarship_dat &lt;- tibble(
+  amount = seq(10, 90, by = 5),
+  offers = c(4, 6, 10, 12, 39, 36, 22, 14, 10, 12, 8, 9, 3, 1, 5, 2, 1),
+  enrolls = c(0, 2, 4, 2, 12, 14, 10, 7, 5, 5, 3, 5, 2, 0, 4, 2, 1)
+)
+
+### Data Preparation
+resp_schol &lt;- cbind(scholarship_dat$enrolls, scholarship_dat$offers-scholarship_dat$enrolls)
+y &lt;- scholarship_dat$enrolls
+x &lt;- scholarship_dat$amount
+m &lt;- scholarship_dat$offers</code></pre>
+<pre class="r"><code>### Logit Model
+logit_schol_mod &lt;- glm(resp_schol~amount, family = binomial(link = 'logit'), data = scholarship_dat)
+summary(logit_schol_mod)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = resp_schol ~ amount, family = binomial(link = &quot;logit&quot;), 
+##     data = scholarship_dat)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.4735  -0.6731   0.1583   0.5285   1.1275  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -1.64764    0.42144  -3.910 9.25e-05 ***
+## amount       0.03095    0.00968   3.197  0.00139 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 21.617  on 16  degrees of freedom
+## Residual deviance: 10.613  on 15  degrees of freedom
+## AIC: 51.078
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code>### Goodness of fit/residuals 
+pi_hat &lt;- fitted(logit_schol_mod)
+G.res &lt;- (y-m*pi_hat)/sqrt(m*pi_hat*(1-pi_hat))
+#Checking that derived residuals match r calculated residuals
+residuals(logit_schol_mod,type='pearson')</code></pre>
+<pre><code>##          1          2          3          4          5          6 
+## -1.0243724  0.5717600  0.9810994 -0.9711570 -0.2647020  0.3289076 
+##          7          8          9         10         11         12 
+##  0.5320014  0.4781082  0.1583651 -0.6722082 -1.0076450 -0.2103582 
+##         13         14         15         16         17 
+##  0.1424593 -1.4004895  0.5054964  0.8650220  0.5661196</code></pre>
+<pre class="r"><code>sum(residuals(logit_schol_mod,type='pearson')^2) # pearson chisq </code></pre>
+<pre><code>## [1] 8.814299</code></pre>
+<pre class="r"><code>dev=sum(residuals(logit_schol_mod,type='deviance')^2);dev # deviance (or obtain from summary(glm_logit)) </code></pre>
+<pre><code>## [1] 10.61271</code></pre>
+<pre class="r"><code># compare with chisq(8-2)
+pval=1-pchisq(dev,15)
+pval </code></pre>
+<pre><code>## [1] 0.7795345</code></pre>
+<p>Based off the p-value of 0.7795345 from the Pearson Chi-Squared text, we fail to reject the null hypothesis that and conclude that the model fits the data.</p>
+<p>##Part ii How do you interpret the relationship between the scholarship amount and enrollment rate? What is 95% CI?</p>
+<pre class="r"><code>vcov(logit_schol_mod)</code></pre>
+<pre><code>##              (Intercept)        amount
+## (Intercept)  0.177611410 -3.809551e-03
+## amount      -0.003809551  9.369767e-05</code></pre>
+<pre class="r"><code>beta_schol &lt;- logit_schol_mod$coefficients[2]
+se_schol &lt;- sqrt(vcov(logit_schol_mod)[2,2])
+CI_schol &lt;- beta_schol+c(qnorm(0.025),-qnorm(0.025))*se_schol</code></pre>
+<p>There is a 0.03095 increase in log odds ratio with every $1000 increase in scholarship amount.</p>
+<p>We are confident 95% that the log odds ratio of enrollment with every $1000 increase in scholarship amounts is between 0.01197845 and 0.04992240.</p>
+<p>##Part iii ###QUESTIONS ABOUT THIS How much scholarship should we provide to get 40% yield rate (the percentage of admitted students who enroll?) What is the 95% CI?</p>
+<pre class="r"><code>beta0_schol &lt;- logit_schol_mod$coefficients[1]
+beta1_schol &lt;- logit_schol_mod$coefficients[2]
+betacov_schol &lt;- vcov(logit_schol_mod)
+x0fit_schol &lt;- (log(0.4/(1-0.4))-beta0_schol)/beta1_schol
+exp(x0fit_schol)</code></pre>
+<pre><code>##  (Intercept) 
+## 2.692149e+17</code></pre>
+<pre class="r"><code>varx0_schol &lt;- betacov_schol[1,1]/(beta1_schol^2)+betacov_schol[2,2]*(beta0_schol^2)/(beta1_schol^4)-2*betacov_schol[1,2]*beta0_schol/(beta1_schol^3)
+c(x0fit_schol, sqrt(varx0_probit))</code></pre>
+<pre><code>## (Intercept)        dose 
+##  40.1342862   0.1742755</code></pre>
+<pre class="r"><code>exp(x0fit_schol + c(qnorm(0.025), -qnorm(0.025))*sqrt(varx0_schol))</code></pre>
+<pre><code>## [1] 1.262487e+12 5.740785e+22</code></pre>
 
 
 

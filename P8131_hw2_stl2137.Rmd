@@ -93,7 +93,7 @@ probit_table <- cbind(beta_probit, CI_probit_low, CI_probit_high, dev_probit, p_
 clog_table <- cbind(beta_clog, CI_clog_low, CI_clog_high, dev_clog, p_clog)
 
 total_dose_table <- rbind(logit_table, probit_table, clog_table)
-knitr::kable(total_dose_table, col.names = c("Estimate of Beta", "Low CI for Beta", "High CI for Beta", "Deviance", "Probability of Death Given Dose = 0.01"), row.names = c("logit", "probit", "c-log-log"), digits = 4)
+knitr::kable(total_dose_table, col.names = c("Estimate of Beta", "Low CI for Beta", "High CI for Beta", "Deviance", "Probability of Death Given Dose = 0.01"), digits = 4)
 ```
 
 #What comments should I write?
@@ -118,7 +118,7 @@ c(x0fit_logit, sqrt(varx0_logit))
 exp(x0fit_logit+c(qnorm(0.05),-qnorm(0.05))*sqrt(varx0_logit))
 ```
 
-For the logit model, we are 95% confidence that the LD50 dose is between 5.5096 and 9.9096.
+For the logit model, we are 90% confidence that the LD50 dose is between 5.5096 and 9.9096.
 
 ```{r}
 ###Probit
