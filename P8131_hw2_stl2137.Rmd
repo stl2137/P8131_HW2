@@ -8,9 +8,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-#Problem 1
-##Part i
-Fill out the table and give comments.
+# Problem 1
+## Part i
 ```{r} 
 ### Import Data
 dose_dat <- tibble(
@@ -23,12 +22,12 @@ dose_dat <- tibble(
 resp <- cbind(dose_dat$death, dose_dat$num_total-dose_dat$death)
 ```
 
+### Logit Model
 ```{r}
-## Logit Model
 ### Summary Statistics
 logit_dose_mod <- glm(resp~dose, family = binomial(link='logit'), data = dose_dat)
 summary(logit_dose_mod)
-plot(dose_dat$dose,dose_dat$death/dose_dat$num_total)
+#plot(dose_dat$dose,dose_dat$death/dose_dat$num_total)
 
 ### CI for Beta
 vcov(logit_dose_mod)
@@ -45,8 +44,8 @@ p_hat_logit = predict(logit_dose_mod, data.frame(dose= 0.01), se.fit=TRUE, type 
 p_logit = p_hat_logit[[1]]
 ```
 
+### Probit Model
 ```{r}
-## Probit Model
 ### Summary Statistics
 probit_dose_mod <- glm(resp~dose, family=binomial(link='probit'), data = dose_dat)
 summary(probit_dose_mod)
@@ -66,8 +65,8 @@ p_hat_probit = predict(probit_dose_mod, data.frame(dose= 0.01), se.fit=TRUE, typ
 p_probit = p_hat_probit[[1]]
 ```
 
-```{r}
 ### C-log-log Model
+```{r}
 clog_dose_mod <- glm(resp~dose, family=binomial(link='cloglog'), data = dose_dat)
 summary(clog_dose_mod)
 
@@ -87,16 +86,17 @@ p_hat_clog = predict(clog_dose_mod, data.frame(dose= 0.01), se.fit=TRUE, type = 
 p_clog = p_hat_clog[[1]]
 ```
 
+### Creating the table
+
 ```{r}
 logit_table <- cbind(beta_logit, CI_logit_low, CI_logit_high, dev_logit, p_logit)
 probit_table <- cbind(beta_probit, CI_probit_low, CI_probit_high, dev_probit, p_probit)
 clog_table <- cbind(beta_clog, CI_clog_low, CI_clog_high, dev_clog, p_clog)
 
 total_dose_table <- rbind(logit_table, probit_table, clog_table)
+row.names(total_dose_table) = c("logit", "probit", "c-log-log")
 knitr::kable(total_dose_table, col.names = c("Estimate of Beta", "Low CI for Beta", "High CI for Beta", "Deviance", "Probability of Death Given Dose = 0.01"), digits = 4)
 ```
-
-#What comments should I write?
 
 The estimate of beta value for the logit model is higher than the other models at 1.1619 compared to the probit's 0.6864 and the c-log-log's 0.7468. 
 
@@ -104,10 +104,11 @@ The probability of death given that the dose equals 0.01 is higher for the c-log
 
 The deviance for the c-log-log model (2.2305) is also extremely high compared to the logit (0.3787) and probit models (0.3137). With such a high deviance, the c-log-log model is not the most appropriate model to use. 
 
-##Part ii
-Suppose that the dose level is in natural logarithm scale, estimate LD50 with 90% confidence interval based on the three models.
+## Part ii
+
+### Logit
 ```{r}
-###Logit
+
 beta0_logit <- logit_dose_mod$coefficients[1]
 beta1_logit <- logit_dose_mod$coefficients[2]
 betacov_logit <- vcov(logit_dose_mod)
@@ -120,8 +121,8 @@ exp(x0fit_logit+c(qnorm(0.05),-qnorm(0.05))*sqrt(varx0_logit))
 
 For the logit model, we are 90% confidence that the LD50 dose is between 5.5096 and 9.9096.
 
+### Probit
 ```{r}
-###Probit
 beta0_probit <- probit_dose_mod$coefficients[1]
 beta1_probit <- probit_dose_mod$coefficients[2]
 betacov_probit <- vcov(probit_dose_mod)
@@ -134,8 +135,9 @@ exp(x0fit_probit+c(qnorm(0.05),-qnorm(0.05))*sqrt(varx0_probit))
 
 For the probit model, we are 95% confident that the LD50 dose is between 5.5826 and 9.9904. 
 
-```{r}
 ### C-log-log
+
+```{r}
 beta0_clog <- clog_dose_mod$coefficients[1]
 beta1_clog <- clog_dose_mod$coefficients[2]
 betacov_clog <- vcov(clog_dose_mod)
@@ -148,9 +150,8 @@ exp(x0fit_clog+c(qnorm(0.05), -qnorm(0.05))*sqrt(varx0_clog))
 
 For the c-log-log model, we are 95% confident that the LD50 dose is between 6.6363 and 11.7787.
 
-#Problem 2
-##Part i
-How does the model fit the data?
+# Problem 2
+## Part i
 ```{r}
 ### Import Data
 scholarship_dat <- tibble(
@@ -166,14 +167,14 @@ x <- scholarship_dat$amount
 m <- scholarship_dat$offers
 ```
 
-```{r}
 ### Logit Model
+```{r}
 logit_schol_mod <- glm(resp_schol~amount, family = binomial(link = 'logit'), data = scholarship_dat)
 summary(logit_schol_mod)
 ```
 
+### Goodness of fit/residuals
 ```{r}
-### Goodness of fit/residuals 
 pi_hat <- fitted(logit_schol_mod)
 G.res <- (y-m*pi_hat)/sqrt(m*pi_hat*(1-pi_hat))
 #Checking that derived residuals match r calculated residuals
@@ -197,7 +198,7 @@ se_schol <- sqrt(vcov(logit_schol_mod)[2,2])
 CI_schol <- beta_schol+c(qnorm(0.025),-qnorm(0.025))*se_schol
 ```
 
-There is a 0.03095 increase in log odds ratio with every $1000 increase in scholarship amount. 
+There is a 0.03095 increase in the log odds ratio with every $1000 increase in scholarship amount. 
 
 We are confident 95% that the log odds ratio of enrollment with every $1000 increase in scholarship amounts is between 0.01197845 and 0.04992240. 
 
@@ -209,10 +210,10 @@ beta0_schol <- logit_schol_mod$coefficients[1]
 beta1_schol <- logit_schol_mod$coefficients[2]
 betacov_schol <- vcov(logit_schol_mod)
 x0fit_schol <- (log(0.4/(1-0.4))-beta0_schol)/beta1_schol
-exp(x0fit_schol)
+(x0fit_schol)
 varx0_schol <- betacov_schol[1,1]/(beta1_schol^2)+betacov_schol[2,2]*(beta0_schol^2)/(beta1_schol^4)-2*betacov_schol[1,2]*beta0_schol/(beta1_schol^3)
 c(x0fit_schol, sqrt(varx0_probit))
-exp(x0fit_schol + c(qnorm(0.025), -qnorm(0.025))*sqrt(varx0_schol))
-
+(x0fit_schol + c(qnorm(0.025), -qnorm(0.025))*sqrt(varx0_schol))
 ```
 
+To provide a 40% yield rate, we should provide 40,134.29 in scholarship funds. We are  95% confident that the amount needed to provide a 40% yield rate is between 27,8641 and 52,404.47. 
