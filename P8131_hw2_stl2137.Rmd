@@ -98,11 +98,11 @@ row.names(total_dose_table) = c("logit", "probit", "c-log-log")
 knitr::kable(total_dose_table, col.names = c("Estimate of Beta", "Low CI for Beta", "High CI for Beta", "Deviance", "Probability of Death Given Dose = 0.01"), digits = 4)
 ```
 
-The estimate of beta value for the logit model is higher than the other models at 1.1619 compared to the probit's 0.6864 and the c-log-log's 0.7468. 
+* The estimate of beta value for the logit model is higher than the other models at 1.1619 compared to the probit's 0.6864 and the c-log-log's 0.7468. 
 
-The probability of death given that the dose equals 0.01 is higher for the c-log-log model (0.1282) compared to the logit (0.0901) and probit (0.0853) models'.
+* The probability of death given that the dose equals 0.01 is higher for the c-log-log model (0.1282) compared to the logit (0.0901) and probit (0.0853) models'.
 
-The deviance for the c-log-log model (2.2305) is also extremely high compared to the logit (0.3787) and probit models (0.3137). With such a high deviance, the c-log-log model is not the most appropriate model to use. 
+* The deviance for the c-log-log model (2.2305) is also extremely high compared to the logit (0.3787) and probit models (0.3137). With such a high deviance, the c-log-log model is not the most appropriate model to use. 
 
 ## Part ii
 
@@ -189,8 +189,7 @@ pval
 
 Based off the p-value of 0.7795345 from the Pearson Chi-Squared text, we fail to reject the null hypothesis that and conclude that the model fits the data. 
 
-##Part ii
-How do you interpret the relationship between the scholarship amount and enrollment rate? What is 95% CI?
+## Part ii
 ```{r}
 vcov(logit_schol_mod)
 beta_schol <- logit_schol_mod$coefficients[2]
@@ -203,8 +202,6 @@ There is a 0.03095 increase in the log odds ratio with every $1000 increase in s
 We are confident 95% that the log odds ratio of enrollment with every $1000 increase in scholarship amounts is between 0.01197845 and 0.04992240. 
 
 ##Part iii
-###QUESTIONS ABOUT THIS
-How much scholarship should we provide to get 40% yield rate (the percentage of admitted students who enroll?) What is the 95% CI?
 ```{r}
 beta0_schol <- logit_schol_mod$coefficients[1]
 beta1_schol <- logit_schol_mod$coefficients[2]

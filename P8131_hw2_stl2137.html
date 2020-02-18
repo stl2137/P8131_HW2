@@ -563,9 +563,11 @@ knitr::kable(total_dose_table, col.names = c(&quot;Estimate of Beta&quot;, &quot
 </tr>
 </tbody>
 </table>
-<p>The estimate of beta value for the logit model is higher than the other models at 1.1619 compared to the probit’s 0.6864 and the c-log-log’s 0.7468.</p>
-<p>The probability of death given that the dose equals 0.01 is higher for the c-log-log model (0.1282) compared to the logit (0.0901) and probit (0.0853) models’.</p>
-<p>The deviance for the c-log-log model (2.2305) is also extremely high compared to the logit (0.3787) and probit models (0.3137). With such a high deviance, the c-log-log model is not the most appropriate model to use.</p>
+<ul>
+<li><p>The estimate of beta value for the logit model is higher than the other models at 1.1619 compared to the probit’s 0.6864 and the c-log-log’s 0.7468.</p></li>
+<li><p>The probability of death given that the dose equals 0.01 is higher for the c-log-log model (0.1282) compared to the logit (0.0901) and probit (0.0853) models’.</p></li>
+<li><p>The deviance for the c-log-log model (2.2305) is also extremely high compared to the logit (0.3787) and probit models (0.3137). With such a high deviance, the c-log-log model is not the most appropriate model to use.</p></li>
+</ul>
 </div>
 </div>
 <div id="part-ii" class="section level2">
@@ -688,7 +690,10 @@ pval=1-pchisq(dev,15)
 pval </code></pre>
 <pre><code>## [1] 0.7795345</code></pre>
 <p>Based off the p-value of 0.7795345 from the Pearson Chi-Squared text, we fail to reject the null hypothesis that and conclude that the model fits the data.</p>
-<p>##Part ii How do you interpret the relationship between the scholarship amount and enrollment rate? What is 95% CI?</p>
+</div>
+</div>
+<div id="part-ii-1" class="section level2">
+<h2>Part ii</h2>
 <pre class="r"><code>vcov(logit_schol_mod)</code></pre>
 <pre><code>##              (Intercept)        amount
 ## (Intercept)  0.177611410 -3.809551e-03
@@ -698,7 +703,7 @@ se_schol &lt;- sqrt(vcov(logit_schol_mod)[2,2])
 CI_schol &lt;- beta_schol+c(qnorm(0.025),-qnorm(0.025))*se_schol</code></pre>
 <p>There is a 0.03095 increase in the log odds ratio with every $1000 increase in scholarship amount.</p>
 <p>We are confident 95% that the log odds ratio of enrollment with every $1000 increase in scholarship amounts is between 0.01197845 and 0.04992240.</p>
-<p>##Part iii ###QUESTIONS ABOUT THIS How much scholarship should we provide to get 40% yield rate (the percentage of admitted students who enroll?) What is the 95% CI?</p>
+<p>##Part iii</p>
 <pre class="r"><code>beta0_schol &lt;- logit_schol_mod$coefficients[1]
 beta1_schol &lt;- logit_schol_mod$coefficients[2]
 betacov_schol &lt;- vcov(logit_schol_mod)
@@ -713,7 +718,6 @@ c(x0fit_schol, sqrt(varx0_probit))</code></pre>
 <pre class="r"><code>(x0fit_schol + c(qnorm(0.025), -qnorm(0.025))*sqrt(varx0_schol))</code></pre>
 <pre><code>## [1] 27.86410 52.40447</code></pre>
 <p>To provide a 40% yield rate, we should provide 40,134.29 in scholarship funds. We are 95% confident that the amount needed to provide a 40% yield rate is between 27,8641 and 52,404.47.</p>
-</div>
 </div>
 </div>
 
